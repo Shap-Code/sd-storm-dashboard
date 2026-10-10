@@ -39,4 +39,8 @@ for k,u in {'goes':'https://cdn.star.nesdis.gov/GOES18/ABI/SECTOR/psw/GEOCOLOR/G
     try:
         r=urllib.request.urlopen(urllib.request.Request(u,headers=UA,method='HEAD'),timeout=20); chk[k]={'status':r.status,'type':r.headers.get('Content-Type'),'len':r.headers.get('Content-Length')}
     except Exception as e: chk[k]={'error':str(e)}
+try:
+    ts=json.loads(get('https://slider.cira.colostate.edu/data/json/goes-18/conus/geocolor/latest_times.json'))['timestamps_int'][:12]
+    chk['goes_frames']=[f"https://slider.cira.colostate.edu/data/imagery/{str(t)[:4]}/{str(t)[4:6]}/{str(t)[6:8]}/goes-18---conus/geocolor/{t}/00/000_000.png" for t in reversed(ts)]
+except Exception as e: chk['goes_frames_error']=str(e)
 json.dump(chk,open('data/check.json','w'),indent=1)

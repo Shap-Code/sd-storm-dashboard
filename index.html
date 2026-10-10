@@ -84,8 +84,7 @@ pre.afd{white-space:pre-wrap;font-size:.72rem;max-height:300px;overflow:auto;bac
  <div class="two">
   <div class="pn"><h2 class="mono">TROPICAL SYSTEMS — NHC <span class="ts" id="ts-nhc"></span></h2><div id="nhc">Loading…</div></div>
   <div class="pn"><h2 class="mono">SATELLITE & RADAR LOOPS <span class="ts" id="ts-sat"></span></h2>
-   <img class="fit" id="goes" alt="GOES-West GeoColor" src="https://cdn.star.nesdis.gov/GOES18/ABI/SECTOR/psw/GEOCOLOR/GOES18-PSW-GEOCOLOR-600x600.gif" onerror="this.outerHTML='<div class=err>GOES image unavailable — <a target=_blank href=https://www.star.nesdis.gov/GOES/sector.php?sat=G18&sector=psw>open NESDIS viewer</a></div>'">
-   <div class="cap">GOES-West GeoColor loop, Pacific Southwest · <a target="_blank" href="https://www.star.nesdis.gov/GOES/sector.php?sat=G18&sector=psw">NESDIS ↗</a></div>
+   <img class="fit" id="goes" alt="GOES-West GeoColor loop"><div class="cap" id="goescap">GOES-18 (West) GeoColor loop via CIRA/RAMMB SLIDER · <a target="_blank" href="https://slider.cira.colostate.edu/?sat=goes-18&sec=conus&p[0]=geocolor">SLIDER ↗</a></div>
    <img class="fit" id="knkx" alt="KNKX radar loop" src="https://radar.weather.gov/ridge/standard/KNKX_loop.gif">
    <div class="cap">NWS KNKX (San Diego) radar loop</div></div>
  </div>
@@ -191,8 +190,10 @@ async function nhc(){try{const d=await J('data/nhc.json?'+Date.now());const dist
 async function afd(){try{const l=await J('https://api.weather.gov/products/types/AFD/locations/SGX');const p=await J(l['@graph'][0]['@id']);
  let t=p.productText;const m=t.match(/\.SYNOPSIS[\s\S]*?(?=\n\.[A-Z]|&&)/);const k=t.match(/\.KEY MESSAGES[\s\S]*?(?=\n\.[A-Z]|&&)/);
  $('afd').textContent=`Issued ${fmt(new Date(p.issuanceTime))}\n\n`+((k?k[0]+'\n\n':'')+(m?m[0]:t.slice(0,3000))).trim();$('afd').insertAdjacentHTML('afterend','');stamp('ts-afd')}catch(e){fail('afd','ts-afd',e)}}
-function refreshImgs(){for(const id of ['goes','knkx']){const i=$(id);if(i&&i.src)i.src=i.src.split('?')[0]+'?'+Date.now()}stamp('ts-sat');stamp('ts-ero')}
+let gF=[],gI=0;async function goes(){try{const c=await J('data/check.json?'+Date.now());if(!c.goes_frames?.length)throw new Error('no frames');gF=c.goes_frames;gF.forEach(u=>{new Image().src=u});const t=gF.at(-1).match(/\/(\d{14})\//)[1];$('goescap').firstChild.textContent=`GOES-18 GeoColor loop (${gF.length} frames, latest ${fmt(new Date(Date.UTC(+t.slice(0,4),+t.slice(4,6)-1,+t.slice(6,8),+t.slice(8,10),+t.slice(10,12))))}) via CIRA SLIDER · `;stamp('ts-sat')}catch(e){$('goes').outerHTML='<div class=err>Satellite loop unavailable</div>';stamp('ts-sat',false)}}
+setInterval(()=>{const g=$('goes');if(g&&g.tagName=='IMG'&&gF.length){gI=(gI+1)%gF.length;g.src=gF[gI]}},600);
+function refreshImgs(){goes();for(const id of ['knkx']){const i=$(id);if(i&&i.src)i.src=i.src.split('?')[0]+'?'+Date.now()}stamp('ts-sat');stamp('ts-ero')}
 function load(){alerts();forecast();obs();tides();marine();nhc();afd();$('upd').textContent=fmt(new Date())}
-initMap();radar();load();stamp('ts-sat');stamp('ts-ero');
+initMap();radar();load();goes();stamp('ts-ero');
 setInterval(radar,5*60e3);setInterval(load,10*60e3);setInterval(refreshImgs,10*60e3);
 </script></body></html>
