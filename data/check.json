@@ -1,0 +1,6 @@
+{
+ "fetched": "2026-10-10T14:03:19.109431+00:00",
+ "goes": {
+  "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>"
+ }
+}

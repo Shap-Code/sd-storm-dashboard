@@ -1,5 +1,8 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SD Coastal Storm — Situation Report</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 :root{--bg:#05080d;--pn:#0b111a;--ln:#1c2a3a;--tx:#d7e3ef;--mu:#6f8399;--red:#ff3b3b;--amb:#ffb020;--grn:#2fd27a;--cy:#38c6ff}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif}
@@ -11,81 +14,185 @@
 .threat.RED{color:#fff;background:#8a0f12;border-color:var(--red);animation:pulse 1.6s infinite}.threat.AMBER{color:#000;background:var(--amb)}.threat.GREEN{color:#000;background:var(--grn)}
 @keyframes pulse{50%{box-shadow:0 0 18px var(--red)}}
 .ticker{overflow:hidden;white-space:nowrap;background:#120607;border-bottom:1px solid var(--ln);font-size:.8rem;padding:6px 0}
-.ticker span{display:inline-block;padding-left:100%;animation:tick 70s linear infinite}@keyframes tick{to{transform:translateX(-100%)}}
-main{padding:12px;display:grid;gap:12px;grid-template-columns:320px minmax(0,1fr);max-width:1700px;margin:auto}
-@media(max-width:900px){main{grid-template-columns:1fr}}
-.pn{background:var(--pn);border:1px solid var(--ln);border-radius:6px;padding:10px}
-.pn h2{margin:0 0 8px;font-size:.72rem;letter-spacing:.15em;color:var(--mu)}
-.kv{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--ln);font-size:.85rem}.kv b{text-align:right}
+.ticker span{display:inline-block;padding-left:100%;animation:tick 90s linear infinite}@keyframes tick{to{transform:translateX(-100%)}}
+main{padding:12px;display:grid;gap:12px;grid-template-columns:330px minmax(0,1fr);max-width:1800px;margin:auto}
+@media(max-width:900px){main{grid-template-columns:minmax(0,1fr)}}
+.col{min-width:0;display:grid;gap:12px;align-content:start;grid-template-columns:minmax(0,1fr)}
+.two{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.pn{background:var(--pn);border:1px solid var(--ln);border-radius:6px;padding:10px;min-width:0}
+.pn h2{margin:0 0 8px;font-size:.72rem;letter-spacing:.15em;color:var(--mu);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pn h2 .ts{color:#4c5e72;letter-spacing:0;font-weight:400}
+.kv{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--ln);font-size:.84rem}.kv b{text-align:right}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:var(--grn);box-shadow:0 0 6px currentColor}
 .dot.r{background:var(--red)}.dot.a{background:var(--amb)}
 .al{padding:7px 8px;margin-bottom:6px;border-left:3px solid var(--amb);background:#0f1722;font-size:.8rem}.al.W{border-color:var(--red)}.al .mono{color:var(--mu);font-size:.7rem}
-.wall{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.wall{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
 .cam{position:relative;aspect-ratio:16/9;background:#000;border:1px solid var(--ln);border-radius:4px;overflow:hidden}
 .cam iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .cam .lbl{position:absolute;left:0;top:0;z-index:2;background:rgba(0,0,0,.7);padding:3px 7px;font-size:.68rem;pointer-events:none}
 .tl{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
 .fp{min-width:150px;background:#0f1722;border:1px solid var(--ln);border-radius:4px;padding:8px;font-size:.78rem}.fp .t{font-size:1.3rem;color:var(--cy)}
 .fp.hi{border-color:var(--red)}a{color:var(--cy)}.links a{display:block;padding:3px 0;font-size:.82rem}
+#map{height:440px;border-radius:4px;background:#000}.ctl{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px;font-size:.78rem}
+button{background:#132030;color:var(--tx);border:1px solid var(--ln);border-radius:4px;padding:4px 9px;cursor:pointer;font:inherit}
+img.fit{width:100%;border-radius:4px;background:#000;display:block}.cap{font-size:.72rem;color:var(--mu);margin:4px 0 8px}
+.storm{background:#0f1722;border:1px solid var(--ln);border-radius:4px;padding:8px;margin-bottom:8px;font-size:.82rem}.storm.near{border-color:var(--red)}
+.big{font-size:1.5rem;color:var(--cy)}.grid3{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+.stat{background:#0f1722;border:1px solid var(--ln);border-radius:4px;padding:8px;font-size:.75rem;color:var(--mu)}.stat b{display:block;font-size:1.2rem;color:var(--tx);font-family:ui-monospace,monospace}
+pre.afd{white-space:pre-wrap;font-size:.72rem;max-height:300px;overflow:auto;background:#070b11;padding:8px;border-radius:4px;margin:0}
+.err{color:var(--amb);font-size:.78rem}.cw{position:relative;height:240px}
 </style></head><body>
 <div class="banner"><div><h1 class="mono">SAN DIEGO COASTAL STORM — SITUATION REPORT</h1>
-<div class="sub mono">CAMPLAND ON THE BAY · 32.7925N 117.2236W · NWS/NOAA LIVE · UPDATED <span id="upd">--</span></div></div>
+<div class="sub mono">CAMPLAND ON THE BAY · 32.7925N 117.2236W · NWS/NOAA/NHC LIVE · PAGE LOADED <span id="upd">--</span></div></div>
 <div id="threat" class="threat mono AMBER">THREAT: --</div><div class="clock mono" id="clock">--:--:-- PT</div></div>
 <div class="ticker mono"><span id="tick">Loading alerts…</span></div>
 <main>
-<aside style="min-width:0;display:grid;gap:12px;align-content:start">
- <div class="pn"><h2 class="mono">KEY FACTS</h2>
+<aside class="col">
+ <div class="pn"><h2 class="mono">KEY FACTS <span class="ts" id="ts-kf"></span></h2>
   <div class="kv"><span>Location</span><b>Campland, 2211 Pacific Beach Dr</b></div>
   <div class="kv"><span>Flood warning</span><b id="kfw">--</b></div>
   <div class="kv"><span>Tropical storm</span><b id="kts">--</b></div>
+  <div class="kv"><span>Nearest tropical system</span><b id="kns">--</b></div>
   <div class="kv"><span>Next high tide (La Jolla)</span><b class="mono" id="ktide">--</b></div>
+  <div class="kv"><span>Water level now</span><b class="mono" id="kwl">--</b></div>
   <div class="kv"><span>Rain next 24h</span><b class="mono" id="krain">--</b></div>
   <div class="kv"><span>Wind next 24h</span><b class="mono" id="kwind">--</b></div></div>
- <div class="pn"><h2 class="mono">ACTIVE ALERTS</h2><div id="alerts">Loading…</div></div>
- <div class="pn links"><h2 class="mono">LINKS</h2>
-  <a href="https://radar.weather.gov/station/KNKX/standard" target="_blank">▸ NWS San Diego Radar (KNKX)</a>
+ <div class="pn"><h2 class="mono">CURRENT CONDITIONS <span class="ts" id="ts-obs"></span></h2><div id="obs">Loading…</div></div>
+ <div class="pn"><h2 class="mono">ACTIVE ALERTS <span class="ts" id="ts-al"></span></h2><div id="alerts">Loading…</div></div>
+ <div class="pn links"><h2 class="mono">TRAVEL — SURPRISE AZ → I-10 / I-8 → SAN DIEGO</h2>
+  <a href="https://quickmap.dot.ca.gov/" target="_blank">▸ Caltrans QuickMap (I-8 closures, chain control, cams)</a>
+  <a href="https://roads.dot.ca.gov/?roadnumber=8" target="_blank">▸ Caltrans road conditions — I-8</a>
+  <a href="https://www.az511.gov/" target="_blank">▸ AZ511 (I-10 / I-8 Arizona)</a>
+  <a href="https://www.weather.gov/psr/" target="_blank">▸ NWS Phoenix (AZ desert leg)</a>
+  <a href="https://www.campland.com/" target="_blank">▸ Campland on the Bay — (858) 581-4260</a></div>
+ <div class="pn links"><h2 class="mono">EMERGENCY</h2>
+  <a href="https://www.alertsandiego.org/" target="_blank">▸ AlertSanDiego — sign up for local alerts</a>
+  <a href="https://www.sdcountyemergency.com/" target="_blank">▸ SD County Emergency (map & updates)</a>
+  <a href="https://www.sandiego.gov/stormwater" target="_blank">▸ City of San Diego storm info</a>
+  <a href="https://www.weather.gov/sgx/" target="_blank">▸ NWS San Diego</a>
   <a href="https://www.nhc.noaa.gov/" target="_blank">▸ National Hurricane Center</a>
   <a href="https://tidesandcurrents.noaa.gov/stationhome.html?id=9410230" target="_blank">▸ NOAA Tides — La Jolla 9410230</a>
-  <a href="https://www.campland.com/" target="_blank">▸ Campland on the Bay</a></div>
+  <div class="cap">Emergency: call 911 · Non-emergency SDPD (619) 531-2000</div></div>
 </aside>
-<section style="min-width:0;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-content:start">
- <div class="pn"><h2 class="mono"><span class="dot"></span>CAM WALL — LIVE</h2><div class="wall" id="wall"></div></div>
- <div class="pn"><h2 class="mono">FORECAST TIMELINE — NWS SGX</h2><div class="tl" id="fc">Loading…</div></div>
+<section class="col">
+ <div class="pn"><h2 class="mono"><span><span class="dot r"></span>LIVE RADAR — RAINVIEWER ANIMATED + IEM NEXRAD</span><span class="ts" id="ts-rad"></span></h2>
+  <div id="map"></div>
+  <div class="ctl mono"><button id="play">⏸ Pause</button><span id="frame">--</span>
+   <label><input type="checkbox" id="nexrad"> NOAA NEXRAD (IEM, 5-min)</label>
+   <a href="https://radar.weather.gov/station/KNKX/standard" target="_blank">NWS KNKX radar ↗</a></div></div>
+ <div class="pn"><h2 class="mono"><span><span class="dot"></span>CAM WALL — LIVE</span></h2><div class="wall" id="wall"></div></div>
+ <div class="two">
+  <div class="pn"><h2 class="mono">TROPICAL SYSTEMS — NHC <span class="ts" id="ts-nhc"></span></h2><div id="nhc">Loading…</div></div>
+  <div class="pn"><h2 class="mono">SATELLITE & RADAR LOOPS <span class="ts" id="ts-sat"></span></h2>
+   <img class="fit" id="goes" alt="GOES-West GeoColor" src="https://cdn.star.nesdis.gov/GOES18/ABI/SECTOR/psw/GEOCOLOR/GOES18-PSW-GEOCOLOR-600x600.gif" onerror="this.outerHTML='<div class=err>GOES image unavailable — <a target=_blank href=https://www.star.nesdis.gov/GOES/sector.php?sat=G18&sector=psw>open NESDIS viewer</a></div>'">
+   <div class="cap">GOES-West GeoColor loop, Pacific Southwest · <a target="_blank" href="https://www.star.nesdis.gov/GOES/sector.php?sat=G18&sector=psw">NESDIS ↗</a></div>
+   <img class="fit" id="knkx" alt="KNKX radar loop" src="https://radar.weather.gov/ridge/standard/KNKX_loop.gif">
+   <div class="cap">NWS KNKX (San Diego) radar loop</div></div>
+ </div>
+ <div class="two">
+  <div class="pn"><h2 class="mono">TIDE & COASTAL FLOOD — LA JOLLA 9410230 (MLLW) <span class="ts" id="ts-tide"></span></h2><div class="cw"><canvas id="tideC"></canvas></div><div id="tideInfo" class="cap"></div></div>
+  <div class="pn"><h2 class="mono">HOURLY — NEXT 48H (NWS) <span class="ts" id="ts-hr"></span></h2><div class="cw"><canvas id="hrC"></canvas></div><div class="cap">Gusts from NWS gridpoint data where available.</div></div>
+ </div>
+ <div class="two">
+  <div class="pn"><h2 class="mono">SURF / MARINE <span class="ts" id="ts-mar"></span></h2><div id="buoys" class="grid3">Loading…</div><div id="marine" style="margin-top:8px;font-size:.8rem"></div></div>
+  <div class="pn"><h2 class="mono">EXCESSIVE RAINFALL — WPC <span class="ts" id="ts-ero"></span></h2>
+   <img class="fit" alt="WPC Day 1 ERO" src="https://www.wpc.ncep.noaa.gov/qpf/94ewbg.gif"><div class="cap">Day 1 Excessive Rainfall Outlook</div>
+   <img class="fit" alt="WPC Day 2 ERO" src="https://www.wpc.ncep.noaa.gov/qpf/98ewbg.gif"><div class="cap">Day 2 · <a target="_blank" href="https://www.wpc.ncep.noaa.gov/qpf/excessive_rainfall_outlook_ero.php">WPC ERO ↗</a></div></div>
+ </div>
+ <div class="pn"><h2 class="mono">NWS SAN DIEGO AREA FORECAST DISCUSSION <span class="ts" id="ts-afd"></span></h2><pre class="afd mono" id="afd">Loading…</pre></div>
+ <div class="pn"><h2 class="mono">FORECAST TIMELINE — NWS SGX <span class="ts" id="ts-fc"></span></h2><div class="tl" id="fc">Loading…</div></div>
 </section></main>
 <script>
-const CAMS=[
-['MISSION BAY','https://www.youtube.com/embed/ZkL-C27cq0c?autoplay=1&mute=1&playsinline=1'],
+const CAMP=[32.7925,-117.2236],P='32.7925,-117.2236',H={Accept:'application/geo+json'},$=i=>document.getElementById(i);
+const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const TZ='America/Los_Angeles',fmt=d=>d.toLocaleString('en-US',{timeZone:TZ,weekday:'short',hour:'numeric',minute:'2-digit'})+' PT';
+const stamp=(id,ok=true)=>{$(id).textContent=(ok?'✓ ':'⚠ ')+'updated '+new Date().toLocaleTimeString('en-US',{timeZone:TZ,hour:'numeric',minute:'2-digit'})+' PT'};
+const J=async(u,o)=>{const r=await fetch(u,o);if(!r.ok)throw new Error(r.status+' '+u.split('?')[0]);return r.json()};
+const fail=(id,ts,e)=>{$(id).innerHTML=`<div class="err">Source unavailable (${esc(e.message||e)}). Will retry.</div>`;stamp(ts,false)};
+const mph=kmh=>kmh==null?null:Math.round(kmh*0.621371);
+setInterval(()=>$('clock').textContent=new Date().toLocaleTimeString('en-US',{timeZone:TZ,hour12:false})+' PT',1000);
+// Cams
+const CAMS=[['MISSION BAY','https://www.youtube.com/embed/ZkL-C27cq0c?autoplay=1&mute=1&playsinline=1'],
 ['MISSION BAY — SD ROWING CLUB','https://www.youtube.com/embed/7esMbPeSjpk?autoplay=1&mute=1&playsinline=1'],
 ['LA JOLLA BEACH','https://www.youtube.com/embed/YQovPWtgydY?autoplay=1&mute=1&playsinline=1'],
 ['OCEAN BEACH — SURF','https://watch.hdrelay.io/player.html?cam=cam_ocean_beach__fixed_wisenet_surf_camera_1788546138920&profile=p_mtst3uisa243&sig=dce98cedc694276fc20d1f8f&exp=1820416586819&dom='],
 ['SAN DIEGO BAY — SHELTER ISLAND','https://www.youtube.com/embed/ct7IRmzDggk?autoplay=1&mute=1&playsinline=1'],
 ['SAN DIEGO — ROTATING FEED','https://www.youtube.com/embed/edz0ux7JClE?autoplay=1&mute=1&playsinline=1']];
-document.getElementById('wall').innerHTML=CAMS.map(([n,u])=>`<div class="cam"><div class="lbl mono"><span class="dot r"></span>${n}</div><iframe src="${u}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`).join('');
-const fmt=d=>d.toLocaleString('en-US',{timeZone:'America/Los_Angeles',weekday:'short',hour:'numeric',minute:'2-digit'})+' PT';
-setInterval(()=>document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{timeZone:'America/Los_Angeles',hour12:false})+' PT',1000);
-const P='32.7925,-117.2236',H={Accept:'application/geo+json'},$=i=>document.getElementById(i);
-const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-async function alerts(){try{const f=(await (await fetch('https://api.weather.gov/alerts/active?point='+P,{headers:H})).json()).features||[];
- const ev=f.map(x=>x.properties);const w=ev.some(p=>/Warning/.test(p.event)),wa=ev.some(p=>/Watch|Advisory|Statement/.test(p.event));
- const lv=w?'RED':wa?'AMBER':'GREEN';$('threat').className='threat mono '+lv;$('threat').textContent='THREAT: '+(w?'RED — WARNING IN EFFECT':wa?'AMBER — WATCH/ADVISORY':'GREEN — NO ALERTS');
+$('wall').innerHTML=CAMS.map(([n,u])=>`<div class="cam"><div class="lbl mono"><span class="dot r"></span>${n}</div><iframe src="${u}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`).join('');
+// Radar map
+let map,frames=[],layers=[],fi=0,playing=true,rvHost='',nexLayer;
+function initMap(){map=L.map('map',{zoomControl:true}).setView([32.95,-117.3],8);
+ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:12}).addTo(map);
+ L.circleMarker(CAMP,{radius:8,color:'#fff',weight:2,fillColor:'#ff3b3b',fillOpacity:1}).addTo(map).bindTooltip('⛺ Campland on the Bay',{permanent:true,direction:'right',className:'mono'});
+ nexLayer=L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png',{opacity:.65,attribution:'NEXRAD via Iowa Environmental Mesonet'});
+ $('nexrad').onchange=e=>e.target.checked?nexLayer.addTo(map):map.removeLayer(nexLayer);
+ $('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'⏸ Pause':'▶ Play'};
+ setInterval(()=>{if(playing&&layers.length)show((fi+1)%layers.length)},700);}
+function show(i){if(layers[fi])layers[fi].setOpacity(0);fi=i;layers[fi].setOpacity(.7);const t=new Date(frames[fi].time*1000);$('frame').textContent=fmt(t)+(frames[fi].nowcast?' (nowcast)':'')}
+async function radar(){try{const d=await J('https://api.rainviewer.com/public/weather-maps.json');rvHost=d.host;
+ layers.forEach(l=>map.removeLayer(l));frames=[...d.radar.past,...(d.radar.nowcast||[]).map(f=>({...f,nowcast:1}))];
+ layers=frames.map(f=>L.tileLayer(`${rvHost}${f.path}/256/{z}/{x}/{y}/4/1_1.png`,{opacity:0,maxNativeZoom:7,maxZoom:12,attribution:'Radar © RainViewer'}).addTo(map));
+ show(Math.max(0,d.radar.past.length-1));if(nexLayer&&map.hasLayer(nexLayer))nexLayer.redraw();stamp('ts-rad');
+ }catch(e){$('frame').innerHTML='<span class="err">RainViewer failed — use NEXRAD toggle / KNKX loop</span>';stamp('ts-rad',false)}}
+// Alerts
+async function alerts(){try{const ev=(await J('https://api.weather.gov/alerts/active?point='+P,{headers:H})).features.map(x=>x.properties);
+ const w=ev.some(p=>/Warning/.test(p.event)),wa=ev.some(p=>/Watch|Advisory|Statement/.test(p.event)),lv=w?'RED':wa?'AMBER':'GREEN';
+ $('threat').className='threat mono '+lv;$('threat').textContent='THREAT: '+(w?'RED — WARNING IN EFFECT':wa?'AMBER — WATCH/ADVISORY':'GREEN — NO ALERTS');
  $('tick').textContent=ev.length?ev.map(p=>'⚠ '+p.headline.toUpperCase()).join('   ///   '):'NO ACTIVE NWS ALERTS';
- $('alerts').innerHTML=ev.length?ev.map(p=>`<div class="al ${/Warning/.test(p.event)?'W':''}"><b>${esc(p.event)}</b> <span class="mono">[${p.severity}]</span><div class="mono">ENDS ${fmt(new Date(p.ends||p.expires))}</div></div>`).join(''):'None';
+ $('alerts').innerHTML=ev.length?ev.map(p=>`<div class="al ${/Warning/.test(p.event)?'W':''}"><b>${esc(p.event)}</b> <span class="mono">[${p.severity}]</span><div class="mono">ENDS ${fmt(new Date(p.ends||p.expires))}</div><details><summary class="mono" style="font-size:.7rem;cursor:pointer">details</summary><div style="font-size:.74rem;white-space:pre-wrap">${esc(p.description)}\n\n${esc(p.instruction||'')}</div></details></div>`).join(''):'None';
  const fw=ev.find(p=>/Flood Warning/.test(p.event)),fwa=ev.find(p=>/Flood Watch|Flood Advisory/.test(p.event));
  $('kfw').innerHTML=fw?`<span class="dot r"></span>${esc(fw.event)} until ${fmt(new Date(fw.ends||fw.expires))}`:fwa?`<span class="dot a"></span>${esc(fwa.event)}`:'<span class="dot"></span>None';
- const ts=ev.find(p=>/Tropical Storm|Hurricane/.test(p.event));$('kts').innerHTML=ts?`<span class="dot ${/Warning/.test(ts.event)?'r':'a'}"></span>${esc(ts.event)}`:'<span class="dot"></span>None';
-}catch(e){$('tick').textContent='ALERT FEED ERROR: '+e}}
-async function forecast(){try{const pt=await (await fetch('https://api.weather.gov/points/'+P,{headers:H})).json();
- const ps=(await (await fetch(pt.properties.forecast,{headers:H})).json()).properties.periods;
- $('fc').innerHTML=ps.map(p=>{const r=p.probabilityOfPrecipitation?.value??0;return `<div class="fp ${r>=60?'hi':''}"><b>${esc(p.name)}</b><div class="t mono">${p.temperature}°</div><div>${esc(p.shortForecast)}</div><div class="mono" style="color:var(--mu)">💧${r}% 💨${esc(p.windSpeed)} ${esc(p.windDirection)}</div></div>`}).join('');
- const hr=(await (await fetch(pt.properties.forecastHourly,{headers:H})).json()).properties.periods.slice(0,24);
- const mr=Math.max(...hr.map(h=>h.probabilityOfPrecipitation?.value??0)),mw=Math.max(...hr.map(h=>parseInt(h.windSpeed)||0));
- $('krain').textContent='max '+mr+'% chance';$('kwind').textContent='up to '+mw+' mph sustained';
-}catch(e){$('fc').textContent='FORECAST ERROR: '+e}}
-async function tide(){try{const u='https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&station=9410230&datum=MLLW&time_zone=lst_ldt&units=english&interval=hilo&format=json&application=sd_storm_dash&date=today&range=48';
- const now=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Los_Angeles'}));
- const n=(await (await fetch(u.replace('date=today&','begin_date='+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'&'))).json()).predictions.find(p=>p.type=='H'&&new Date(p.t.replace(' ','T'))>now);
- $('ktide').textContent=n?`${(+n.v).toFixed(1)} ft @ ${new Date(n.t.replace(' ','T')).toLocaleString('en-US',{weekday:'short',hour:'numeric',minute:'2-digit'})} PT`:'n/a';
-}catch(e){$('ktide').textContent='error'}}
-function load(){alerts();forecast();tide();$('upd').textContent=fmt(new Date())}
-load();setInterval(load,600000);
+ const ts=ev.find(p=>/Tropical Storm|Hurricane/.test(p.event)&&!/Statement/.test(p.event));$('kts').innerHTML=ts?`<span class="dot ${/Warning/.test(ts.event)?'r':'a'}"></span>${esc(ts.event)}`:'<span class="dot"></span>None';
+ stamp('ts-al');stamp('ts-kf');}catch(e){$('tick').textContent='ALERT FEED ERROR — CHECK weather.gov/sgx';fail('alerts','ts-al',e)}}
+// Forecast + hourly chart
+let hrChart;
+async function forecast(){try{const pt=await J('https://api.weather.gov/points/'+P,{headers:H});
+ const ps=(await J(pt.properties.forecast,{headers:H})).properties.periods;
+ $('fc').innerHTML=ps.map(p=>{const r=p.probabilityOfPrecipitation?.value??0;return `<div class="fp ${r>=60?'hi':''}"><b>${esc(p.name)}</b><div class="t mono">${p.temperature}°</div><div>${esc(p.shortForecast)}</div><div class="mono" style="color:var(--mu)">💧${r}% 💨${esc(p.windSpeed)} ${esc(p.windDirection)}</div></div>`}).join('');stamp('ts-fc');
+ const hr=(await J(pt.properties.forecastHourly,{headers:H})).properties.periods.slice(0,48);
+ let gust={};try{const g=await J(pt.properties.forecastGridData,{headers:H});(g.properties.windGust?.values||[]).forEach(v=>{const [s,dur]=v.validTime.split('/');const h=+(dur.match(/(\d+)H/)||[0,1])[1]+24*+((dur.match(/(\d+)D/)||[0,0])[1]);for(let i=0;i<h;i++)gust[new Date(+new Date(s)+i*36e5).getTime()]=mph(v.value)})}catch(e){}
+ const lab=hr.map(h=>new Date(h.startTime).toLocaleString('en-US',{timeZone:TZ,weekday:'short',hour:'numeric'}));
+ const rain=hr.map(h=>h.probabilityOfPrecipitation?.value??0),wind=hr.map(h=>parseInt(h.windSpeed)||0),gu=hr.map(h=>gust[new Date(h.startTime).getTime()]??null);
+ $('krain').textContent='max '+Math.max(...rain.slice(0,24))+'% chance';$('kwind').textContent='to '+Math.max(...wind.slice(0,24))+' mph'+(gu.some(x=>x)?', gusts '+Math.max(...gu.slice(0,24).filter(x=>x!=null))+' mph':'');
+ hrChart?.destroy();hrChart=new Chart($('hrC'),{data:{labels:lab,datasets:[{type:'bar',label:'Rain %',data:rain,backgroundColor:'rgba(56,198,255,.45)',yAxisID:'p'},{type:'line',label:'Wind mph',data:wind,borderColor:'#2fd27a',pointRadius:0,yAxisID:'w'},{type:'line',label:'Gust mph',data:gu,borderColor:'#ff3b3b',borderDash:[4,3],pointRadius:0,yAxisID:'w'}]},options:chartOpts({p:{position:'left',min:0,max:100,title:{display:true,text:'%',color:'#6f8399'}},w:{position:'right',min:0,grid:{display:false},title:{display:true,text:'mph',color:'#6f8399'}}})});
+ stamp('ts-hr');}catch(e){fail('fc','ts-fc',e);stamp('ts-hr',false)}}
+function chartOpts(scales){Object.values(scales).forEach(s=>{s.ticks={color:'#6f8399'};s.grid=s.grid||{color:'#1c2a3a'}});return{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#d7e3ef',boxWidth:12}}},scales:{x:{ticks:{color:'#6f8399',maxTicksLimit:10},grid:{color:'#1c2a3a'}},...scales}}}
+// Observations
+async function obs(){const out=[];for(const [id,n] of [['KSAN','San Diego Intl (Lindbergh)'],['KMYF','Montgomery Field']]){try{const p=(await J(`https://api.weather.gov/stations/${id}/observations/latest`,{headers:H})).properties;
+ const c=p.temperature.value,f=c==null?'--':Math.round(c*9/5+32);out.push(`<div class="kv"><span><b class="mono">${id}</b> ${n}<br><span class="cap">${esc(p.textDescription)} · ${fmt(new Date(p.timestamp))}</span></span><b class="mono">${f}°F<br>💨${mph(p.windSpeed.value)??'--'}${p.windGust.value?' G'+mph(p.windGust.value):''} mph ${p.windDirection.value??''}°</b></div>`)}catch(e){out.push(`<div class="err">${id}: unavailable</div>`)}}
+ $('obs').innerHTML=out.join('');stamp('ts-obs')}
+// Tides
+let tideChart;const ymd=d=>d.toLocaleDateString('en-CA',{timeZone:TZ}).replaceAll('-','');
+async function tides(){try{const B='https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?station=9410230&datum=MLLW&time_zone=lst_ldt&units=english&format=json&application=sd_storm_dash';
+ const y=new Date(Date.now()-864e5);const [pr,hl,ob,fl,dm]=await Promise.all([J(B+'&product=predictions&interval=h&begin_date='+ymd(y)+'&range=96'),J(B+'&product=predictions&interval=hilo&begin_date='+ymd(y)+'&range=96'),J(B+'&product=water_level&range=36').catch(()=>({data:[]})),J('https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9410230/floodlevels.json').catch(()=>({})),J('https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9410230/datums.json?units=english').catch(()=>({datums:[]}))]);
+ const off=(dm.datums.find(d=>d.name=='MLLW')||{}).value;const thr=off!=null?{minor:(fl.nws_minor??fl.nos_minor)-off,mod:fl.nos_moderate-off,maj:fl.nos_major-off}:null;
+ const lt=s=>new Date(s.replace(' ','T')+(()=>{const o=new Date().toLocaleString('en-US',{timeZone:TZ,timeZoneName:'shortOffset'}).match(/GMT([+-]\d+)/);return (o?(o[1].length==2?o[1][0]+'0'+o[1][1]:o[1]):'-07')+':00'})());
+ const P2=pr.predictions.map(p=>({x:lt(p.t),y:+p.v})),O=(ob.data||[]).filter((_,i)=>i%5==0).map(p=>({x:lt(p.t),y:+p.v}));
+ const now=new Date(),nh=hl.predictions.map(p=>({...p,d:lt(p.t)})).filter(p=>p.d>now);const nH=nh.find(p=>p.type=='H');
+ $('ktide').textContent=nH?`${(+nH.v).toFixed(1)} ft @ ${fmt(nH.d)}`:'n/a';
+ const last=(ob.data||[]).at(-1);if(last){const pp=P2.reduce((a,b)=>Math.abs(b.x-lt(last.t))<Math.abs(a.x-lt(last.t))?b:a);const anom=(+last.v-pp.y);$('kwl').innerHTML=`${(+last.v).toFixed(2)} ft (${anom>=0?'+':''}${anom.toFixed(2)} vs pred)`}
+ const L2=x=>({x:P2[0].x,y:x}),R2=x=>({x:P2.at(-1).x,y:x});const ds=[{label:'Predicted',data:P2,borderColor:'#38c6ff',pointRadius:0,tension:.3},{label:'Observed',data:O,borderColor:'#ffb020',pointRadius:0,borderWidth:2}];
+ if(thr){ds.push({label:`Minor flood ${thr.minor.toFixed(1)} ft`,data:[L2(thr.minor),R2(thr.minor)],borderColor:'#ff3b3b',borderDash:[6,4],pointRadius:0},{label:`Moderate ${thr.mod.toFixed(1)} ft`,data:[L2(thr.mod),R2(thr.mod)],borderColor:'#a020f0',borderDash:[2,4],pointRadius:0})}
+ const nowLine={id:'now',afterDraw(c){const x=c.scales.x.getPixelForValue(Date.now());const g=c.ctx;g.save();g.strokeStyle='#fff';g.setLineDash([3,3]);g.beginPath();g.moveTo(x,c.chartArea.top);g.lineTo(x,c.chartArea.bottom);g.stroke();g.restore()}};
+ tideChart?.destroy();tideChart=new Chart($('tideC'),{type:'line',data:{datasets:ds},plugins:[nowLine],options:{...chartOpts({y:{title:{display:true,text:'ft MLLW',color:'#6f8399'}}}),parsing:true,scales:{x:{type:'linear',ticks:{color:'#6f8399',maxTicksLimit:8,callback:v=>new Date(v).toLocaleString('en-US',{timeZone:TZ,weekday:'short',hour:'numeric'})},grid:{color:'#1c2a3a'}},y:{ticks:{color:'#6f8399'},grid:{color:'#1c2a3a'},title:{display:true,text:'ft MLLW',color:'#6f8399'}}},plugins:{legend:{labels:{color:'#d7e3ef',boxWidth:12}},tooltip:{callbacks:{title:i=>fmt(new Date(i[0].parsed.x))}}}}});
+ const peak=nh.filter(p=>p.type=='H').slice(0,4);$('tideInfo').innerHTML='Upcoming: '+nh.slice(0,6).map(p=>`<span class="mono">${p.type=='H'?'▲':'▼'} ${(+p.v).toFixed(1)}ft ${fmt(p.d)}</span>`).join(' · ')+(thr?`<br>Flood thresholds (NOAA/NWS, converted to MLLW): minor ${thr.minor.toFixed(2)} ft, moderate ${thr.mod.toFixed(2)}, major ${thr.maj.toFixed(2)}. Highest predicted high: ${Math.max(...peak.map(p=>+p.v)).toFixed(1)} ft — storm surge/rain adds on top; Campland sits near bay level. Mission Bay has no NOAA real-time gauge; La Jolla is the closest.`:'');
+ stamp('ts-tide')}catch(e){fail('tideInfo','ts-tide',e)}}
+// Marine
+async function marine(){try{const b=await J('data/buoys.json?'+Date.now());$('buoys').innerHTML=['46232','46254'].map(id=>{const x=b[id];const o=x?.obs?.find(o=>o.wvht_m!=null);return o?`<div class="stat">NDBC ${id} ${esc(x.name)}<b>${(o.wvht_m*3.281).toFixed(1)} ft</b>${o.dpd_s??'--'}s · ${o.mwd??'--'}° · ${o.wtmp_c!=null?Math.round(o.wtmp_c*9/5+32)+'°F water':''}<br>${fmt(new Date(o.t))}</div>`:`<div class="stat err">${id} n/a</div>`}).join('')+`<div class="stat">Cache refreshed<b style="font-size:.85rem">${fmt(new Date(b.fetched))}</b>via GitHub Action</div>`}catch(e){$('buoys').innerHTML='<div class="err">Buoy cache unavailable — <a target=_blank href=https://www.ndbc.noaa.gov/station_page.php?station=46232>NDBC 46232</a></div>'}
+ try{const z=(await J('https://api.weather.gov/zones/coastal/PZZ740/forecast',{headers:H})).properties.periods.slice(0,3);$('marine').innerHTML='<b class="mono" style="font-size:.72rem;color:var(--mu)">PZZ740 COASTAL WATERS FORECAST</b>'+z.map(p=>`<div style="margin:4px 0"><b>${esc(p.name)}:</b> ${esc(p.detailedForecast)}</div>`).join('')}catch(e){$('marine').innerHTML='<div class="err">Marine zone forecast unavailable</div>'}stamp('ts-mar')}
+// NHC
+async function nhc(){try{const d=await J('data/nhc.json?'+Date.now());const dist=(a,b)=>{const R=3959,r=Math.PI/180,dl=(b[0]-a[0])*r,dn=(b[1]-a[1])*r;const h=Math.sin(dl/2)**2+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
+ const CL={HU:'Hurricane',TS:'Tropical Storm',TD:'Tropical Depression',PTC:'Potential Trop. Cyclone',STS:'Subtropical Storm',PT:'Post-Tropical'};
+ const st=d.storms.map(s=>({...s,mi:Math.round(dist(CAMP,[s.latitudeNumeric,s.longitudeNumeric]))})).sort((a,b)=>a.mi-b.mi);
+ if(!st.length){$('nhc').innerHTML='No active tropical cyclones.';$('kns').textContent='None'}else{const n=st[0];$('kns').innerHTML=`<span class="dot ${n.mi<800?'r':'a'}"></span>${esc(CL[n.classification]||n.classification)} ${esc(n.name)} · ${n.mi} mi`;
+ $('nhc').innerHTML=st.map((s,i)=>`<div class="storm ${i==0&&s.mi<1200?'near':''}"><b>${esc(CL[s.classification]||s.classification)} ${esc(s.name)}</b> <span class="mono cap">${esc(s.id.toUpperCase())}</span><div class="mono">${s.intensity} kt (${Math.round(s.intensity*1.15)} mph) · ${s.pressure} mb · ${s.latitude} ${s.longitude} · moving ${s.movementDir}° at ${s.movementSpeed} kt · <b>${s.mi} mi from Campland</b></div><div class="cap">Advisory ${esc(s.publicAdvisory?.advNum)} · ${fmt(new Date(s.lastUpdate))} · <a target=_blank href="${s.publicAdvisory?.url}">public advisory</a> · <a target=_blank href="${s.graphicsPage}">graphics</a> · <a target=_blank href="${s.forecastDiscussion?.url}">discussion</a></div>${i==0&&s.images?.cone?`<img class="fit" src="${s.images.cone}" alt="cone"><div class="cap">5-day forecast cone</div>`:''}${i==0&&s.images?.keymsg?`<img class="fit" src="${s.images.keymsg}" alt="key messages"><div class="cap">NHC key messages</div>`:''}${i==0&&s.images?.toa?`<img class="fit" src="${s.images.toa}" alt="arrival"><div class="cap">Earliest reasonable arrival of TS-force winds</div>`:''}</div>`).join('')+`<div class="cap">Storm data cached ${fmt(new Date(d.fetched))} from NHC CurrentStorms.json (GitHub Action, ~10 min)</div>`}
+ stamp('ts-nhc')}catch(e){fail('nhc','ts-nhc',e)}}
+// AFD
+async function afd(){try{const l=await J('https://api.weather.gov/products/types/AFD/locations/SGX');const p=await J(l['@graph'][0]['@id']);
+ let t=p.productText;const m=t.match(/\.SYNOPSIS[\s\S]*?(?=\n\.[A-Z]|&&)/);const k=t.match(/\.KEY MESSAGES[\s\S]*?(?=\n\.[A-Z]|&&)/);
+ $('afd').textContent=`Issued ${fmt(new Date(p.issuanceTime))}\n\n`+((k?k[0]+'\n\n':'')+(m?m[0]:t.slice(0,3000))).trim();$('afd').insertAdjacentHTML('afterend','');stamp('ts-afd')}catch(e){fail('afd','ts-afd',e)}}
+function refreshImgs(){for(const id of ['goes','knkx']){const i=$(id);if(i&&i.src)i.src=i.src.split('?')[0]+'?'+Date.now()}stamp('ts-sat');stamp('ts-ero')}
+function load(){alerts();forecast();obs();tides();marine();nhc();afd();$('upd').textContent=fmt(new Date())}
+initMap();radar();load();stamp('ts-sat');stamp('ts-ero');
+setInterval(radar,5*60e3);setInterval(load,10*60e3);setInterval(refreshImgs,10*60e3);
 </script></body></html>
