@@ -64,7 +64,7 @@ pre.afd{white-space:pre-wrap;font-size:.72rem;max-height:300px;overflow:auto;bac
   <a href="https://roads.dot.ca.gov/?roadnumber=8" target="_blank">▸ Caltrans road conditions — I-8</a>
   <a href="https://www.az511.gov/" target="_blank">▸ AZ511 (I-10 / I-8 Arizona)</a>
   <a href="https://www.weather.gov/psr/" target="_blank">▸ NWS Phoenix (AZ desert leg)</a>
-  <a href="https://www.campland.com/" target="_blank">▸ Campland on the Bay — (858) 581-4260</a></div>
+  <a href="https://www.campland.com/contact/" target="_blank">▸ Campland on the Bay — main (858) 581-4200 · reservations 581-4260 · rangers/security 581-4219</a></div>
  <div class="pn links"><h2 class="mono">EMERGENCY</h2>
   <a href="https://www.alertsandiego.org/" target="_blank">▸ AlertSanDiego — sign up for local alerts</a>
   <a href="https://www.sdcountyemergency.com/" target="_blank">▸ SD County Emergency (map & updates)</a>
@@ -121,7 +121,7 @@ $('wall').innerHTML=CAMS.map(([n,u])=>`<div class="cam"><div class="lbl mono"><s
 // Radar map
 let map,frames=[],layers=[],fi=0,playing=true,rvHost='',nexLayer;
 function initMap(){map=L.map('map',{zoomControl:true}).setView([32.95,-117.3],8);
- L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:12}).addTo(map);
+ L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'Tiles © Esri',maxZoom:12}).addTo(map);
  L.circleMarker(CAMP,{radius:8,color:'#fff',weight:2,fillColor:'#ff3b3b',fillOpacity:1}).addTo(map).bindTooltip('⛺ Campland on the Bay',{permanent:true,direction:'right',className:'mono'});
  nexLayer=L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png',{opacity:.65,attribution:'NEXRAD via Iowa Environmental Mesonet'});
  $('nexrad').onchange=e=>e.target.checked?nexLayer.addTo(map):map.removeLayer(nexLayer);
