@@ -1,7 +1,7 @@
 {
- "fetched": "2026-10-22T06:35:52.137606+00:00",
+ "fetched": "2026-10-22T12:18:03.715233+00:00",
  "goes": {
-  "error": "<urlopen error [Errno -5] No address associated with hostname>"
+  "error": "<urlopen error [Errno -2] Name or service not known>"
  },
  "goes_frames_error": "<urlopen error timed out>"
 }
