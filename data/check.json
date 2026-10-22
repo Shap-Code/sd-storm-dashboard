@@ -1,7 +1,20 @@
 {
- "fetched": "2026-10-22T12:18:03.715233+00:00",
+ "fetched": "2026-10-22T17:14:56.002603+00:00",
  "goes": {
-  "error": "<urlopen error [Errno -2] Name or service not known>"
+  "error": "<urlopen error [Errno -5] No address associated with hostname>"
  },
- "goes_frames_error": "<urlopen error timed out>"
+ "goes_frames": [
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022160618/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022161118/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022161618/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022162118/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022162618/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022163118/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022163618/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022164118/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022164618/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022165118/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022165618/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/10/22/goes-18---conus/geocolor/20261022170118/00/000_000.png"
+ ]
 }
