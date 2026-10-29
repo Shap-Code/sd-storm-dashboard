@@ -1,5 +1,5 @@
 {
- "fetched": "2026-10-28T23:24:01.500398+00:00",
+ "fetched": "2026-10-29T02:33:20.125622+00:00",
  "storms": [
   {
    "id": "ep222026",
@@ -105,10 +105,10 @@
    "potentialStormSurgeFloodingGIS": null,
    "peakSurgeKML": null,
    "images": {
-    "cone": "https://www.nhc.noaa.gov/storm_graphics/EP22/refresh/EP222026_5day_cone+png/282032_5day_cone.png",
-    "wind": "https://www.nhc.noaa.gov/storm_graphics/EP22/refresh/EP222026_current_wind+png/282032_current_wind.png",
-    "toa": "https://www.nhc.noaa.gov/storm_graphics/EP22/refresh/EP222026_earliest_reasonable_toa_no_wsp_34+png/282032_earliest_reasonable_toa_no_wsp_34.png",
-    "keymsg": "https://www.nhc.noaa.gov/storm_graphics/EP22/refresh/EP222026_key_messages+png/282032_key_messages.png"
+    "cone": "https://www.nhc.noaa.gov/storm_graphics/EP22/refresh/EP222026_5day_cone+png/290232_5day_cone.png",
+    "wind": "https://www.nhc.noaa.gov/storm_graphics/EP22/refresh/EP222026_current_wind+png/290232_current_wind.png",
+    "toa": "https://www.nhc.noaa.gov/storm_graphics/EP22/refresh/EP222026_earliest_reasonable_toa_no_wsp_34+png/290232_earliest_reasonable_toa_no_wsp_34.png",
+    "keymsg": "https://www.nhc.noaa.gov/storm_graphics/EP22/refresh/EP222026_key_messages+png/290232_key_messages.png"
    },
    "graphicsPage": "https://www.nhc.noaa.gov/graphics_ep2.shtml"
   }
