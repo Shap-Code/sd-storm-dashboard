@@ -1,20 +1,20 @@
 {
- "fetched": "2026-11-09T19:10:08.733544+00:00",
+ "fetched": "2026-11-10T02:08:23.543901+00:00",
  "goes": {
   "error": "<urlopen error [Errno -5] No address associated with hostname>"
  },
  "goes_frames": [
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109180117/00/000_000.png",
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109180617/00/000_000.png",
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109181117/00/000_000.png",
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109181617/00/000_000.png",
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109182117/00/000_000.png",
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109182617/00/000_000.png",
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109183117/00/000_000.png",
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109183617/00/000_000.png",
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109184117/00/000_000.png",
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109184617/00/000_000.png",
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109185117/00/000_000.png",
-  "https://slider.cira.colostate.edu/data/imagery/2026/11/09/goes-18---conus/geocolor/20261109185617/00/000_000.png"
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110010117/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110010617/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110011117/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110011617/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110012117/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110012617/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110013117/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110013617/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110014117/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110014617/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110015117/00/000_000.png",
+  "https://slider.cira.colostate.edu/data/imagery/2026/11/10/goes-18---conus/geocolor/20261110015617/00/000_000.png"
  ]
 }
